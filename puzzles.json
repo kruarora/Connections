@@ -1,0 +1,80 @@
+[
+  {
+    "id": "puzzle1",
+    "name": "Beginner's Luck",
+    "categories": [
+      {
+        "name": "MUSICAL INSTRUMENTS",
+        "words": ["TRUMPET", "GUITAR", "PIANO", "DRUMS"],
+        "color": "category-yellow"
+      },
+      {
+        "name": "FRUITS",
+        "words": ["APPLE", "BANANA", "CHERRY", "GRAPE"],
+        "color": "category-green"
+      },
+      {
+        "name": "WEATHER PHENOMENA",
+        "words": ["RAIN", "SNOW", "WIND", "SUN"],
+        "color": "category-blue"
+      },
+      {
+        "name": "THINGS WITH WINGS",
+        "words": ["BIRD", "PLANE", "BAT", "ANGEL"],
+        "color": "category-purple"
+      }
+    ]
+  },
+  {
+    "id": "puzzle2",
+    "name": "Kitchen & Cosmos",
+    "categories": [
+      {
+        "name": "TYPES OF FISH",
+        "words": ["SALMON", "TUNA", "COD", "TROUT"],
+        "color": "category-yellow"
+      },
+      {
+        "name": "KITCHEN APPLIANCES",
+        "words": ["BLENDER", "TOASTER", "MICROWAVE", "OVEN"],
+        "color": "category-green"
+      },
+      {
+        "name": "PLANETS",
+        "words": ["EARTH", "MARS", "JUPITER", "SATURN"],
+        "color": "category-blue"
+      },
+      {
+        "name": "TERMS OF ENDEARMENT",
+        "words": ["HONEY", "DEAR", "SWEETIE", "LOVE"],
+        "color": "category-purple"
+      }
+    ]
+  },
+  {
+    "id": "puzzle3",
+    "name": "Animal Kingdom",
+    "categories": [
+      {
+        "name": "FELINES",
+        "words": ["LION", "TIGER", "LEOPARD", "JAGUAR"],
+        "color": "category-yellow"
+      },
+      {
+        "name": "CANINES",
+        "words": ["WOLF", "FOX", "COYOTE", "JACKAL"],
+        "color": "category-green"
+      },
+      {
+        "name": "FARM ANIMALS",
+        "words": ["COW", "PIG", "SHEEP", "CHICKEN"],
+        "color": "category-blue"
+      },
+      {
+        "name": "SEA CREATURES WITH SHELLS",
+        "words": ["CRAB", "LOBSTER", "SNAIL", "TURTLE"],
+        "color": "category-purple"
+      }
+    ]
+  }
+]
