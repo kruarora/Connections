@@ -4,6 +4,656 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connections Challenge Deluxe</title>
     <style>
+        /* ... (keep all your existing CSS styles here) ... */
+        :root {
+            /* Light Theme (Default) */
+            --page-bg: #f4f4f9;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --text-color-inverted: #ffffff;
+            --border-color: #dddddd;
+            --word-button-bg: #ffffff;
+            --word-button-hover-bg: #e9e9e9;
+            --word-button-selected-bg: #5c9aff;
+            --word-button-selected-border: #4a88e8;
+            --control-button-bg: #78c2ad;
+            --control-button-hover-bg: #67a894;
+            --mistake-highlight-color: #ff3b30;
+            --shadow-color: rgba(0,0,0,0.1);
+            --shadow-light-color: rgba(0,0,0,0.05);
+
+            --category-yellow-bg: #f7ce46; /* Adjusted yellow for better contrast */
+            --category-green-bg: #4caf50;
+            --category-blue-bg: #2196f3;
+            --category-purple-bg: #9c27b0;
+            --category-text-color: #ffffff;
+
+            --transition-speed-fast: 0.2s;
+            --transition-speed-normal: 0.3s;
+            --transition-speed-slow: 0.5s;
+        }
+
+        [data-theme="dark"] {
+            --page-bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-color-inverted: #121212;
+            --border-color: #333333;
+            --word-button-bg: #2c2c2c;
+            --word-button-hover-bg: #383838;
+            --word-button-selected-bg: #0056b3; /* Darker blue for selection */
+            --word-button-selected-border: #004085;
+            --control-button-bg: #58a68c;
+            --control-button-hover-bg: #4a8c78;
+            --mistake-highlight-color: #ff4d4d;
+            --shadow-color: rgba(255,255,255,0.05);
+            --shadow-light-color: rgba(255,255,255,0.03);
+
+            /* Category colors can often remain the same if text contrast is good */
+            --category-yellow-bg: #f7c840;
+            --category-green-bg: #4caf50;
+            --category-blue-bg: #2196f3;
+            --category-purple-bg: #9c27b0;
+            --category-text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: var(--page-bg);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed-normal) ease, color var(--transition-speed-normal) ease;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 5px;
+            transition: color var(--transition-speed-normal) ease;
+        }
+        #puzzle-name-display {
+            font-size: 1em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        #theme-switcher {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 8px 12px;
+            background-color: var(--control-button-bg);
+            color: var(--text-color-inverted);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: background-color var(--transition-speed-normal) ease, transform var(--transition-speed-fast) ease;
+        }
+        #theme-switcher:hover {
+            background-color: var(--control-button-hover-bg);
+            transform: translateY(-1px);
+        }
+
+
+        #instructions {
+            text-align: center;
+            max-width: 600px;
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            transition: background-color var(--transition-speed-normal) ease, box-shadow var(--transition-speed-normal) ease;
+        }
+
+        #word-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: clamp(320px, 90vw, 440px); /* Responsive width */
+        }
+
+        .word-button {
+            background-color: var(--word-button-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px 10px; /* Adjusted padding */
+            text-align: center;
+            cursor: pointer;
+            font-size: clamp(0.9em, 2.5vw, 1.1em); /* Responsive font size */
+            font-weight: 500;
+            transition: background-color var(--transition-speed-fast) ease,
+                        color var(--transition-speed-fast) ease,
+                        border-color var(--transition-speed-fast) ease,
+                        transform var(--transition-speed-fast) ease-out,
+                        box-shadow var(--transition-speed-fast) ease;
+            user-select: none;
+            box-shadow: 0 2px 4px var(--shadow-light-color);
+            word-break: break-word; /* Prevent overflow */
+        }
+
+        .word-button:hover:not(.selected):not(:disabled) {
+            background-color: var(--word-button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--shadow-light-color);
+        }
+
+        .word-button.selected {
+            background-color: var(--word-button-selected-bg);
+            color: var(--text-color-inverted);
+            border-color: var(--word-button-selected-border);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--word-button-selected-bg);
+        }
+
+        .word-button.correct-group-animation {
+            animation: bounceAndGlow 0.8s forwards;
+        }
+
+        @keyframes bounceAndGlow { /* Updated animation */
+            0% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-10px) scale(1.05); }
+            40% { transform: translateY(0) scale(0.95); }
+            60% { transform: translateY(-5px) scale(1.02); }
+            80% { transform: translateY(0) scale(1); }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8; /* Prepare for fade or visual change */
+            }
+        }
+
+        #controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            justify-content: center;
+        }
+
+        #controls button {
+            padding: 12px 18px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: var(--control-button-bg);
+            color: var(--text-color-inverted);
+            border: none;
+            border-radius: 8px;
+            transition: background-color var(--transition-speed-normal) ease, transform var(--transition-speed-fast) ease;
+            box-shadow: 0 2px 4px var(--shadow-light-color);
+        }
+
+        #controls button:hover:not(:disabled) {
+            background-color: var(--control-button-hover-bg);
+            transform: translateY(-1px);
+        }
+        #controls button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #mistakes-counter {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        #mistakes-counter span {
+            font-weight: bold;
+            color: var(--mistake-highlight-color);
+            transition: color var(--transition-speed-normal) ease;
+        }
+        .mistake-lost-animation {
+            animation: mistakeShake 0.4s ease-in-out;
+        }
+        @keyframes mistakeShake {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        #results-area {
+            width: clamp(320px, 90vw, 440px); /* Match grid width */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .category-display {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: var(--category-text-color); /* Ensure text is readable on colored bg */
+            font-weight: bold;
+            box-shadow: 0 3px 6px var(--shadow-color);
+            opacity: 0; /* Start hidden for animation */
+            transform: translateY(20px); /* Start off-screen for animation */
+            animation: revealCategory 0.5s ease-out forwards;
+        }
+
+        @keyframes revealCategory {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Category Colors using CSS Variables */
+        .category-yellow { background-color: var(--category-yellow-bg); }
+        .category-green { background-color: var(--category-green-bg); }
+        .category-blue { background-color: var(--category-blue-bg); }
+        .category-purple { background-color: var(--category-purple-bg); }
+
+        .category-words {
+            font-size: 0.9em;
+            font-weight: normal;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        #game-over-message, #win-message {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 25px;
+            background-color: var(--container-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            display: none; /* Hidden by default */
+            box-shadow: 0 4px 10px var(--shadow-color);
+            animation: fadeInMessage 0.5s ease-out;
+        }
+        #game-over-message { border-left: 5px solid var(--mistake-highlight-color); }
+        #win-message { border-left: 5px solid var(--category-green-bg); }
+
+
+        @keyframes fadeInMessage {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        #game-over-categories { margin-top: 15px; }
+        #game-over-categories .category-display {
+            /* Ensure these also use variables if needed, though they inherit */
+            font-size: 0.8em; /* Slightly smaller in game over screen */
+            animation: none; /* Don't re-animate on game over */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Shake animation for incorrect grid guess */
+        .shake-animation {
+            animation: shakeGrid 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shakeGrid {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-3px); }
+            40%, 60% { transform: translateX(3px); }
+        }
+
+        #loading-message {
+            font-size: 1.2em;
+            margin-top: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <button id="theme-switcher" aria-label="Toggle theme">🌙 Dark</button>
+
+    <div id="game-container">
+        <h1>Connections Challenge</h1>
+        <div id="puzzle-name-display"></div> <div id="instructions">
+            <p>Find groups of four words that share something in common!</p>
+            <p>Select four words and click "Submit". You have 4 mistakes.</p>
+        </div>
+
+        <div id="mistakes-counter">
+            Mistakes remaining: <span id="mistakes-left">4</span>
+        </div>
+
+        <div id="word-grid">
+            </div>
+        <div id="loading-message" style="display:none;">Loading puzzles...</div>
+
+
+        <div id="controls">
+            <button id="shuffle-button">Shuffle</button>
+            <button id="deselect-button">Deselect All</button>
+            <button id="submit-button">Submit</button>
+        </div>
+
+        <div id="results-area">
+            </div>
+
+        <div id="game-over-message">
+            Game Over! Better luck next time.
+            <div id="game-over-categories"></div>
+        </div>
+        <div id="win-message">
+            🎉 Congratulations! You solved the puzzle! 🎉
+        </div>
+    </div>
+
+    <script>
+        // --- Game Data Storage ---
+        let allAvailablePuzzles = []; // Will hold all puzzles loaded from JSON
+        let currentCategories = []; // Categories for the current game
+        let currentPuzzleName = ""; // Name of the current puzzle
+
+        // --- Game State ---
+        let allWords = [];
+        let selectedWordIds = [];
+        let mistakesLeft = 4;
+        let categoriesFound = 0;
+        let uniqueIdCounter = 0;
+
+        // --- DOM Elements ---
+        const wordGrid = document.getElementById('word-grid');
+        const shuffleButton = document.getElementById('shuffle-button');
+        const deselectButton = document.getElementById('deselect-button');
+        const submitButton = document.getElementById('submit-button');
+        const mistakesLeftSpan = document.getElementById('mistakes-left');
+        const resultsArea = document.getElementById('results-area');
+        const gameOverMessage = document.getElementById('game-over-message');
+        const gameOverCategoriesDiv = document.getElementById('game-over-categories');
+        const winMessage = document.getElementById('win-message');
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const htmlElement = document.documentElement;
+        const loadingMessage = document.getElementById('loading-message');
+        const puzzleNameDisplay = document.getElementById('puzzle-name-display');
+
+
+        // --- Theme Switcher Logic --- (Keep this as is)
+        function setTema(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeSwitcher.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+        }
+        themeSwitcher.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            setTema(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTema(savedTheme);
+
+        // --- Functions ---
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        async function fetchPuzzles() {
+            loadingMessage.style.display = 'block';
+            wordGrid.style.display = 'none'; // Hide grid while loading
+            try {
+                const response = await fetch('puzzles.json'); // Assumes puzzles.json is in the same directory
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allAvailablePuzzles = await response.json();
+                if (allAvailablePuzzles.length === 0) {
+                    throw new Error('No puzzles found in puzzles.json or file is empty.');
+                }
+                loadNewPuzzle(); // Load the first puzzle after fetching
+            } catch (error) {
+                console.error("Could not load puzzles:", error);
+                loadingMessage.textContent = "Error: Could not load puzzles. Please check puzzles.json and refresh.";
+                // Optionally, display this error more prominently on the page
+                wordGrid.innerHTML = `<p style="color:red;">Error loading puzzles. See console for details.</p>`;
+            } finally {
+                loadingMessage.style.display = 'none';
+                wordGrid.style.display = 'grid'; // Show grid again
+            }
+        }
+
+        function loadNewPuzzle() {
+            if (allAvailablePuzzles.length === 0) {
+                console.error("No puzzles available to load.");
+                wordGrid.innerHTML = `<p>No puzzles loaded. Please check your puzzles.json file.</p>`;
+                disableGameControls(true); // Disable all controls
+                return;
+            }
+            const puzzleIndex = Math.floor(Math.random() * allAvailablePuzzles.length);
+            const selectedPuzzle = JSON.parse(JSON.stringify(allAvailablePuzzles[puzzleIndex])); // Deep copy
+
+            currentCategories = selectedPuzzle.categories;
+            currentPuzzleName = selectedPuzzle.name || "Connections Puzzle"; // Use puzzle name or a default
+            puzzleNameDisplay.textContent = currentPuzzleName;
+
+            initializeGame();
+        }
+
+        function initializeGame() {
+            allWords = [];
+            uniqueIdCounter = 0;
+            currentCategories.forEach(cat => {
+                // Ensure categories are reset (not marked as found from a previous game with same object reference)
+                cat.found = false;
+                cat.words.forEach(wordText => {
+                    allWords.push({ text: wordText, id: `word-${uniqueIdCounter++}`, found: false, categoryName: cat.name });
+                });
+            });
+            shuffleArray(allWords);
+            renderWordGrid();
+
+            mistakesLeft = 4;
+            categoriesFound = 0;
+            mistakesLeftSpan.textContent = mistakesLeft;
+            mistakesLeftSpan.classList.remove('mistake-lost-animation');
+            resultsArea.innerHTML = '';
+            selectedWordIds = [];
+
+            // Clear old "Play Again" buttons if they exist
+            const oldWinBtn = winMessage.querySelector('button');
+            if (oldWinBtn) oldWinBtn.remove();
+            const oldLoseBtn = gameOverMessage.querySelector('button');
+            if (oldLoseBtn) oldLoseBtn.remove();
+
+            gameOverMessage.style.display = 'none';
+            winMessage.style.display = 'none';
+            gameOverCategoriesDiv.innerHTML = '';
+            enableGameControls();
+        }
+
+        function renderWordGrid() {
+            wordGrid.innerHTML = ''; // Clear previous grid
+            const activeWords = allWords.filter(wordObj => !wordObj.found);
+
+            activeWords.forEach(wordObj => {
+                const button = document.createElement('button');
+                button.classList.add('word-button');
+                button.textContent = wordObj.text;
+                button.dataset.wordId = wordObj.id;
+                button.addEventListener('click', handleWordSelection);
+                wordGrid.appendChild(button);
+            });
+        }
+
+        function handleWordSelection(event) {
+            // ... (keep this function as is)
+            const selectedButton = event.target;
+            const wordId = selectedButton.dataset.wordId;
+
+            if (selectedWordIds.includes(wordId)) {
+                selectedWordIds = selectedWordIds.filter(id => id !== wordId);
+                selectedButton.classList.remove('selected');
+            } else {
+                if (selectedWordIds.length < 4) {
+                    selectedWordIds.push(wordId);
+                    selectedButton.classList.add('selected');
+                }
+            }
+        }
+
+        function deselectAllWords() {
+            // ... (keep this function as is)
+             selectedWordIds = [];
+            document.querySelectorAll('.word-button.selected').forEach(button => {
+                button.classList.remove('selected');
+            });
+        }
+
+        function handleSubmit() {
+            // ... (keep most of this function as is, minor adjustments for adding Play Again button)
+            if (selectedWordIds.length !== 4) {
+                alert("Please select exactly 4 words.");
+                return;
+            }
+
+            const selectedWordObjects = selectedWordIds.map(id => allWords.find(w => w.id === id));
+            const firstCategoryName = selectedWordObjects[0].categoryName;
+            const allSameCategory = selectedWordObjects.every(w => w.categoryName === firstCategoryName);
+
+            let correctCategory = null;
+            if (allSameCategory) {
+                 correctCategory = currentCategories.find(cat => cat.name === firstCategoryName && !cat.found);
+            }
+
+
+            if (correctCategory) {
+                correctCategory.found = true;
+                const categoryColor = correctCategory.color;
+
+                selectedWordIds.forEach(id => {
+                    const button = wordGrid.querySelector(`.word-button[data-word-id="${id}"]`);
+                    const wordObj = allWords.find(w => w.id === id);
+                    if (button) {
+                        button.classList.add('correct-group-animation');
+                        const tempColorVar = `--${categoryColor.replace('category-', '')}-bg`;
+                        button.style.backgroundColor = `var(${tempColorVar})`;
+                        button.style.color = `var(--category-text-color)`;
+                        button.style.borderColor = `var(${tempColorVar})`;
+                        button.disabled = true;
+                    }
+                    if(wordObj) wordObj.found = true;
+                });
+
+                setTimeout(() => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.classList.add('category-display', categoryColor);
+                    categoryDiv.innerHTML = `
+                        <strong>${correctCategory.name}</strong>
+                        <div class="category-words">${correctCategory.words.join(', ')}</div>
+                    `;
+                    resultsArea.insertBefore(categoryDiv, resultsArea.firstChild);
+
+                    categoriesFound++;
+                    renderWordGrid();
+                    deselectAllWords();
+
+
+                    if (categoriesFound === currentCategories.length) {
+                        winMessage.style.display = 'block';
+                        disableGameControls(false);
+                        const newGameBtn = document.createElement('button');
+                        newGameBtn.textContent = 'Play Another Puzzle';
+                        newGameBtn.style.marginTop = '15px';
+                        newGameBtn.onclick = loadNewPuzzle;
+                        winMessage.appendChild(newGameBtn);
+
+                    }
+                }, 800);
+
+            } else {
+                mistakesLeft--;
+                mistakesLeftSpan.textContent = mistakesLeft;
+                mistakesLeftSpan.classList.add('mistake-lost-animation');
+                setTimeout(() => mistakesLeftSpan.classList.remove('mistake-lost-animation'), 400);
+
+                wordGrid.classList.add('shake-animation');
+                setTimeout(() => {
+                    wordGrid.classList.remove('shake-animation');
+                }, 400);
+
+                if (mistakesLeft === 0) {
+                    revealAllCategories();
+                    gameOverMessage.style.display = 'block';
+                    disableGameControls(true);
+                     const newGameBtn = document.createElement('button');
+                        newGameBtn.textContent = 'Try Another Puzzle';
+                        newGameBtn.style.marginTop = '15px';
+                        newGameBtn.onclick = loadNewPuzzle;
+                        gameOverMessage.appendChild(newGameBtn);
+                }
+                deselectAllWords();
+            }
+        }
+
+        function revealAllCategories() {
+            // ... (keep this function as is)
+            gameOverCategoriesDiv.innerHTML = '';
+            const sortedCategories = [...currentCategories].sort((a,b) => {
+                if (a.found && !b.found) return -1;
+                if (!a.found && b.found) return 1;
+                return 0;
+            });
+
+            sortedCategories.forEach(category => {
+                const catDiv = document.createElement('div');
+                catDiv.classList.add('category-display', category.color);
+                catDiv.style.opacity = 1;
+                catDiv.style.transform = 'translateY(0)';
+                catDiv.innerHTML = `<strong>${category.name}</strong>: ${category.words.join(', ')}`;
+                gameOverCategoriesDiv.appendChild(catDiv);
+            });
+        }
+
+        function disableGameControls(isGameOver) {
+            // ... (keep this function as is)
+            submitButton.disabled = true;
+            deselectButton.disabled = true;
+            shuffleButton.disabled = isGameOver;
+            document.querySelectorAll('.word-button').forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        function enableGameControls() {
+            // ... (keep this function as is)
+            submitButton.disabled = false;
+            deselectButton.disabled = false;
+            shuffleButton.disabled = false;
+        }
+
+        // --- Event Listeners --- (Keep these as is)
+        shuffleButton.addEventListener('click', () => {
+            const wordsToShuffle = allWords.filter(wordObj => !wordObj.found);
+            shuffleArray(wordsToShuffle);
+            const foundWords = allWords.filter(wordObj => wordObj.found);
+            allWords = [...wordsToShuffle, ...foundWords];
+            renderWordGrid();
+            deselectAllWords();
+        });
+
+        deselectButton.addEventListener('click', deselectAllWords);
+        submitButton.addEventListener('click', handleSubmit);
+
+        // --- Initialize ---
+        fetchPuzzles(); // Start by fetching puzzles instead of calling loadNewPuzzle directly
+
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en" data-theme="light"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections Challenge Deluxe</title>
+    <style>
         :root {
             /* Light Theme (Default) */
             --page-bg: #f4f4f9;
