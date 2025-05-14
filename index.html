@@ -1,171 +1,310 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" data-theme="light"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connections Game</title>
+    <title>Connections Challenge Deluxe</title>
     <style>
+        :root {
+            /* Light Theme (Default) */
+            --page-bg: #f4f4f9;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --text-color-inverted: #ffffff;
+            --border-color: #dddddd;
+            --word-button-bg: #ffffff;
+            --word-button-hover-bg: #e9e9e9;
+            --word-button-selected-bg: #5c9aff;
+            --word-button-selected-border: #4a88e8;
+            --control-button-bg: #78c2ad;
+            --control-button-hover-bg: #67a894;
+            --mistake-highlight-color: #ff3b30;
+            --shadow-color: rgba(0,0,0,0.1);
+            --shadow-light-color: rgba(0,0,0,0.05);
+
+            --category-yellow-bg: #f7ce46; /* Adjusted yellow for better contrast */
+            --category-green-bg: #4caf50;
+            --category-blue-bg: #2196f3;
+            --category-purple-bg: #9c27b0;
+            --category-text-color: #ffffff;
+
+            --transition-speed-fast: 0.2s;
+            --transition-speed-normal: 0.3s;
+            --transition-speed-slow: 0.5s;
+        }
+
+        [data-theme="dark"] {
+            --page-bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-color-inverted: #121212;
+            --border-color: #333333;
+            --word-button-bg: #2c2c2c;
+            --word-button-hover-bg: #383838;
+            --word-button-selected-bg: #0056b3; /* Darker blue for selection */
+            --word-button-selected-border: #004085;
+            --control-button-bg: #58a68c;
+            --control-button-hover-bg: #4a8c78;
+            --mistake-highlight-color: #ff4d4d;
+            --shadow-color: rgba(255,255,255,0.05);
+            --shadow-light-color: rgba(255,255,255,0.03);
+
+            /* Category colors can often remain the same if text contrast is good */
+            --category-yellow-bg: #f7c840;
+            --category-green-bg: #4caf50;
+            --category-blue-bg: #2196f3;
+            --category-purple-bg: #9c27b0;
+            --category-text-color: #ffffff;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 20px;
-            background-color: #f4f4f9;
-            color: #333;
+            margin: 0;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: var(--page-bg);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed-normal) ease, color var(--transition-speed-normal) ease;
+            min-height: 100vh;
         }
 
         #game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 15px;
         }
 
         h1 {
-            color: #4a4a4a;
+            color: var(--text-color);
+            margin-bottom: 5px;
+            transition: color var(--transition-speed-normal) ease;
         }
 
+        #theme-switcher {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 8px 12px;
+            background-color: var(--control-button-bg);
+            color: var(--text-color-inverted);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: background-color var(--transition-speed-normal) ease, transform var(--transition-speed-fast) ease;
+        }
+        #theme-switcher:hover {
+            background-color: var(--control-button-hover-bg);
+            transform: translateY(-1px);
+        }
+
+
         #instructions {
-            margin-bottom: 20px;
             text-align: center;
             max-width: 600px;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            transition: background-color var(--transition-speed-normal) ease, box-shadow var(--transition-speed-normal) ease;
         }
 
         #word-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 400px; /* Adjust as needed */
+            gap: 12px;
+            width: clamp(320px, 90vw, 440px); /* Responsive width */
         }
 
         .word-button {
-            background-color: #fff;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
+            background-color: var(--word-button-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px 10px; /* Adjusted padding */
             text-align: center;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s, transform 0.2s;
-            user-select: none; /* Prevent text selection */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: clamp(0.9em, 2.5vw, 1.1em); /* Responsive font size */
+            font-weight: 500;
+            transition: background-color var(--transition-speed-fast) ease,
+                        color var(--transition-speed-fast) ease,
+                        border-color var(--transition-speed-fast) ease,
+                        transform var(--transition-speed-fast) ease-out,
+                        box-shadow var(--transition-speed-fast) ease;
+            user-select: none;
+            box-shadow: 0 2px 4px var(--shadow-light-color);
+            word-break: break-word; /* Prevent overflow */
         }
 
-        .word-button:hover {
-            background-color: #e9e9e9;
+        .word-button:hover:not(.selected):not(:disabled) {
+            background-color: var(--word-button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--shadow-light-color);
         }
 
         .word-button.selected {
-            background-color: #5c9aff; /* Blue for selected */
-            color: white;
-            border-color: #4a88e8;
+            background-color: var(--word-button-selected-bg);
+            color: var(--text-color-inverted);
+            border-color: var(--word-button-selected-border);
             transform: scale(1.05);
+            box-shadow: 0 0 10px var(--word-button-selected-bg);
         }
 
         .word-button.correct-group-animation {
-            animation: bounceAndStay 0.8s forwards;
+            animation: bounceAndGlow 0.8s forwards;
         }
 
-        @keyframes bounceAndStay {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
+        @keyframes bounceAndGlow { /* Updated animation */
+            0% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-10px) scale(1.05); }
+            40% { transform: translateY(0) scale(0.95); }
+            60% { transform: translateY(-5px) scale(1.02); }
+            80% { transform: translateY(0) scale(1); }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8; /* Prepare for fade or visual change */
+            }
         }
-
 
         #controls {
-            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            justify-content: center;
         }
 
         #controls button {
-            padding: 10px 15px;
+            padding: 12px 18px;
             font-size: 1em;
-            margin: 0 5px;
             cursor: pointer;
-            background-color: #78c2ad;
-            color: white;
+            background-color: var(--control-button-bg);
+            color: var(--text-color-inverted);
             border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            border-radius: 8px;
+            transition: background-color var(--transition-speed-normal) ease, transform var(--transition-speed-fast) ease;
+            box-shadow: 0 2px 4px var(--shadow-light-color);
         }
 
-        #controls button:hover {
-            background-color: #67a894;
+        #controls button:hover:not(:disabled) {
+            background-color: var(--control-button-hover-bg);
+            transform: translateY(-1px);
+        }
+        #controls button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        #mistakes-counter, #results-area {
-            margin-bottom: 10px;
+        #mistakes-counter {
+            font-size: 1.1em;
+            font-weight: 500;
         }
-
         #mistakes-counter span {
             font-weight: bold;
-            font-size: 1.2em;
+            color: var(--mistake-highlight-color);
+            transition: color var(--transition-speed-normal) ease;
+        }
+        .mistake-lost-animation {
+            animation: mistakeShake 0.4s ease-in-out;
+        }
+        @keyframes mistakeShake {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        #results-area {
+            width: clamp(320px, 90vw, 440px); /* Match grid width */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .category-display {
-            width: 400px; /* Match grid width */
             padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: center;
-            color: white;
+            color: var(--category-text-color); /* Ensure text is readable on colored bg */
             font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 6px var(--shadow-color);
+            opacity: 0; /* Start hidden for animation */
+            transform: translateY(20px); /* Start off-screen for animation */
+            animation: revealCategory 0.5s ease-out forwards;
         }
 
-        /* Category Colors */
-        .category-yellow { background-color: #f7b731; } /* Yellow */
-        .category-green { background-color: #4caf50; } /* Green */
-        .category-blue { background-color: #2196f3; } /* Blue */
-        .category-purple { background-color: #9c27b0; } /* Purple */
+        @keyframes revealCategory {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Category Colors using CSS Variables */
+        .category-yellow { background-color: var(--category-yellow-bg); }
+        .category-green { background-color: var(--category-green-bg); }
+        .category-blue { background-color: var(--category-blue-bg); }
+        .category-purple { background-color: var(--category-purple-bg); }
 
         .category-words {
             font-size: 0.9em;
             font-weight: normal;
             margin-top: 5px;
+            opacity: 0.9;
         }
 
-        #game-over-message {
-            font-size: 1.5em;
+        #game-over-message, #win-message {
+            font-size: 1.4em;
             font-weight: bold;
             margin-top: 20px;
-            padding: 20px;
-            background-color: #ffdddd;
-            border: 1px solid #ffaaaa;
-            border-radius: 8px;
+            padding: 25px;
+            background-color: var(--container-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
             text-align: center;
             display: none; /* Hidden by default */
+            box-shadow: 0 4px 10px var(--shadow-color);
+            animation: fadeInMessage 0.5s ease-out;
+        }
+        #game-over-message { border-left: 5px solid var(--mistake-highlight-color); }
+        #win-message { border-left: 5px solid var(--category-green-bg); }
+
+
+        @keyframes fadeInMessage {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        #game-over-categories { margin-top: 15px; }
+        #game-over-categories .category-display {
+            /* Ensure these also use variables if needed, though they inherit */
+            font-size: 0.8em; /* Slightly smaller in game over screen */
+            animation: none; /* Don't re-animate on game over */
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        #win-message {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #ddffdd;
-            border: 1px solid #aaffaa;
-            border-radius: 8px;
-            text-align: center;
-            display: none; /* Hidden by default */
+        /* Shake animation for incorrect grid guess */
+        .shake-animation {
+            animation: shakeGrid 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
-
+        @keyframes shakeGrid {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-3px); }
+            40%, 60% { transform: translateX(3px); }
+        }
 
     </style>
 </head>
 <body>
+    <button id="theme-switcher" aria-label="Toggle theme">🌙 Dark</button>
 
     <div id="game-container">
         <h1>Connections Challenge</h1>
 
         <div id="instructions">
             <p>Find groups of four words that share something in common!</p>
-            <p>Select four words and click "Submit" to guess a category.</p>
-            <p>Each puzzle has four categories.</p>
+            <p>Select four words and click "Submit". You have 4 mistakes.</p>
         </div>
 
         <div id="mistakes-counter">
@@ -186,29 +325,43 @@
 
         <div id="game-over-message">
             Game Over! Better luck next time.
-            <p>The categories were:</p>
             <div id="game-over-categories"></div>
         </div>
         <div id="win-message">
-            Congratulations! You solved the puzzle!
+            🎉 Congratulations! You solved the puzzle! 🎉
         </div>
-
     </div>
 
     <script>
         // --- Game Data (Categories and Words) ---
-        const categories = [
-            { name: "MUSICAL INSTRUMENTS", words: ["TRUMPET", "GUITAR", "PIANO", "DRUMS"], color: "category-yellow" },
-            { name: "FRUITS", words: ["APPLE", "BANANA", "CHERRY", "GRAPE"], color: "category-green" },
-            { name: "WEATHER PHENOMENA", words: ["RAIN", "SNOW", "WIND", "SUN"], color: "category-blue" },
-            { name: "THINGS WITH WINGS", words: ["BIRD", "PLANE", "BAT", "ANGEL"], color: "category-purple" }
+        const gameSets = [
+            { // Set 1
+                categories: [
+                    { name: "MUSICAL INSTRUMENTS", words: ["TRUMPET", "GUITAR", "PIANO", "DRUMS"], color: "category-yellow" },
+                    { name: "FRUITS", words: ["APPLE", "BANANA", "CHERRY", "GRAPE"], color: "category-green" },
+                    { name: "WEATHER PHENOMENA", words: ["RAIN", "SNOW", "WIND", "SUN"], color: "category-blue" },
+                    { name: "THINGS WITH WINGS", words: ["BIRD", "PLANE", "BAT", "ANGEL"], color: "category-purple" }
+                ]
+            },
+            { // Set 2 - Example for more puzzles
+                categories: [
+                    { name: "TYPES OF FISH", words: ["SALMON", "TUNA", "COD", "TROUT"], color: "category-yellow" },
+                    { name: "KITCHEN APPLIANCES", words: ["BLENDER", "TOASTER", "MICROWAVE", "OVEN"], color: "category-green" },
+                    { name: "PLANETS", words: ["EARTH", "MARS", "JUPITER", "SATURN"], color: "category-blue" },
+                    { name: "TERMS OF ENDEARMENT", words: ["HONEY", "DEAR", "SWEETIE", "LOVE"], color: "category-purple" }
+                ]
+            }
+            // Add more sets here
         ];
 
+        let currentCategories = []; // Categories for the current game
+
         // --- Game State ---
-        let allWords = [];
-        let selectedWords = [];
+        let allWords = []; // This will store {text: "WORD", id: "word-0", found: false} objects
+        let selectedWordIds = [];
         let mistakesLeft = 4;
         let categoriesFound = 0;
+        let uniqueIdCounter = 0; // For unique word IDs if words can repeat across categories in future
 
         // --- DOM Elements ---
         const wordGrid = document.getElementById('word-grid');
@@ -220,6 +373,25 @@
         const gameOverMessage = document.getElementById('game-over-message');
         const gameOverCategoriesDiv = document.getElementById('game-over-categories');
         const winMessage = document.getElementById('win-message');
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const htmlElement = document.documentElement;
+
+        // --- Theme Switcher Logic ---
+        function setTema(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeSwitcher.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+        }
+
+        themeSwitcher.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            setTema(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTema(savedTheme);
+
 
         // --- Functions ---
 
@@ -231,16 +403,29 @@
             }
         }
 
+        function loadNewPuzzle() {
+            const puzzleIndex = Math.floor(Math.random() * gameSets.length);
+            currentCategories = JSON.parse(JSON.stringify(gameSets[puzzleIndex].categories)); // Deep copy
+            initializeGame();
+        }
+
         function initializeGame() {
             allWords = [];
-            categories.forEach(cat => allWords.push(...cat.words));
+            uniqueIdCounter = 0;
+            currentCategories.forEach(cat => {
+                cat.words.forEach(wordText => {
+                    allWords.push({ text: wordText, id: `word-${uniqueIdCounter++}`, found: false, categoryName: cat.name });
+                });
+            });
             shuffleArray(allWords);
             renderWordGrid();
+
             mistakesLeft = 4;
             categoriesFound = 0;
             mistakesLeftSpan.textContent = mistakesLeft;
+            mistakesLeftSpan.classList.remove('mistake-lost-animation');
             resultsArea.innerHTML = '';
-            selectedWords = [];
+            selectedWordIds = [];
             gameOverMessage.style.display = 'none';
             winMessage.style.display = 'none';
             gameOverCategoriesDiv.innerHTML = '';
@@ -249,206 +434,184 @@
 
         function renderWordGrid() {
             wordGrid.innerHTML = ''; // Clear previous grid
-            allWords.forEach(word => {
-                if (!word.found) { // Only render words not yet in a found category
-                    const button = document.createElement('button');
-                    button.classList.add('word-button');
-                    button.textContent = word;
-                    button.dataset.word = word; // Store the word in a data attribute
-                    button.addEventListener('click', handleWordSelection);
-                    wordGrid.appendChild(button);
-                }
+            const activeWords = allWords.filter(wordObj => !wordObj.found);
+
+            activeWords.forEach(wordObj => {
+                const button = document.createElement('button');
+                button.classList.add('word-button');
+                button.textContent = wordObj.text;
+                button.dataset.wordId = wordObj.id;
+                button.addEventListener('click', handleWordSelection);
+                wordGrid.appendChild(button);
             });
         }
 
         function handleWordSelection(event) {
             const selectedButton = event.target;
-            const word = selectedButton.dataset.word;
+            const wordId = selectedButton.dataset.wordId;
 
-            if (selectedWords.includes(word)) {
-                // Deselect word
-                selectedWords = selectedWords.filter(w => w !== word);
+            if (selectedWordIds.includes(wordId)) {
+                selectedWordIds = selectedWordIds.filter(id => id !== wordId);
                 selectedButton.classList.remove('selected');
             } else {
-                // Select word
-                if (selectedWords.length < 4) {
-                    selectedWords.push(word);
+                if (selectedWordIds.length < 4) {
+                    selectedWordIds.push(wordId);
                     selectedButton.classList.add('selected');
                 }
             }
         }
 
         function deselectAllWords() {
-            selectedWords = [];
+            selectedWordIds = [];
             document.querySelectorAll('.word-button.selected').forEach(button => {
                 button.classList.remove('selected');
             });
         }
 
         function handleSubmit() {
-            if (selectedWords.length !== 4) {
+            if (selectedWordIds.length !== 4) {
+                // Simple feedback, could be a styled modal/toast later
                 alert("Please select exactly 4 words.");
                 return;
             }
 
+            const selectedWordObjects = selectedWordIds.map(id => allWords.find(w => w.id === id));
+            const firstCategoryName = selectedWordObjects[0].categoryName;
+            const allSameCategory = selectedWordObjects.every(w => w.categoryName === firstCategoryName);
+
             let correctCategory = null;
-            for (const category of categories) {
-                const isMatch = selectedWords.every(word => category.words.includes(word)) &&
-                                category.words.every(word => selectedWords.includes(word));
-                if (isMatch) {
-                    correctCategory = category;
-                    break;
-                }
+            if (allSameCategory) {
+                 correctCategory = currentCategories.find(cat => cat.name === firstCategoryName && !cat.found);
             }
 
+
             if (correctCategory) {
-                // Mark words as found (so they are not re-rendered or re-shuffled)
-                // and apply temporary animation
-                selectedWords.forEach(wordValue => {
-                    const button = wordGrid.querySelector(`.word-button[data-word="${wordValue}"]`);
+                correctCategory.found = true; // Mark category as found
+                const categoryColor = correctCategory.color;
+
+                // Animate and then "move" words
+                selectedWordIds.forEach(id => {
+                    const button = wordGrid.querySelector(`.word-button[data-word-id="${id}"]`);
+                    const wordObj = allWords.find(w => w.id === id);
                     if (button) {
                         button.classList.add('correct-group-animation');
-                        button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue(`--${correctCategory.color.replace('category-', '')}-bg`) || correctCategory.color.split('-')[1]; // Fallback
-                        button.style.color = 'white';
-                        button.disabled = true; // Disable after correct
+                        // Temporarily color button based on its category for the animation
+                        const tempColorVar = `--${categoryColor.replace('category-', '')}-bg`;
+                        button.style.backgroundColor = `var(${tempColorVar})`;
+                        button.style.color = `var(--category-text-color)`;
+                        button.style.borderColor = `var(${tempColorVar})`;
+                        button.disabled = true;
                     }
-                    // Find the word in allWords and mark it as part of a found category
-                    const wordObj = allWords.find(w => w === wordValue);
-                    if(wordObj) wordObj.found = true; // This assumes allWords contains objects or needs adjustment
+                    if(wordObj) wordObj.found = true;
                 });
 
-
-                // Create a new div for the found category and add it to the top of resultsArea
-                const categoryDiv = document.createElement('div');
-                categoryDiv.classList.add('category-display', correctCategory.color);
-                categoryDiv.innerHTML = `
-                    <strong>${correctCategory.name}</strong>
-                    <div class="category-words">${correctCategory.words.join(', ')}</div>
-                `;
-                resultsArea.insertBefore(categoryDiv, resultsArea.firstChild);
-
-
-                // Remove found words from the grid display logic after animation
                 setTimeout(() => {
-                    // Hide the words that were correctly guessed
-                    selectedWords.forEach(wordValue => {
-                         const button = wordGrid.querySelector(`.word-button[data-word="${wordValue}"]`);
-                         if(button) button.style.visibility = 'hidden'; // Hide instead of removing for layout stability
-                    });
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.classList.add('category-display', categoryColor);
+                    categoryDiv.innerHTML = `
+                        <strong>${correctCategory.name}</strong>
+                        <div class="category-words">${correctCategory.words.join(', ')}</div>
+                    `;
+                    resultsArea.insertBefore(categoryDiv, resultsArea.firstChild);
 
                     categoriesFound++;
-                    deselectAllWords(); // Clear selection
-                    // Do not re-render grid here, as we are just hiding elements.
-                    // If you were removing elements, you would re-render.
+                    // Re-render grid with remaining words
+                    renderWordGrid();
+                    deselectAllWords(); // Clear selection for safety, though grid re-render handles it
 
-                    if (categoriesFound === categories.length) {
+
+                    if (categoriesFound === currentCategories.length) {
                         winMessage.style.display = 'block';
-                        disableGameControls();
+                        disableGameControls(false); // Keep shuffle for new game potentially
+                        // Offer a "New Game" button or auto-start
+                        const newGameBtn = document.createElement('button');
+                        newGameBtn.textContent = 'Play Again?';
+                        newGameBtn.onclick = loadNewPuzzle;
+                        winMessage.appendChild(newGameBtn);
+
                     }
                 }, 800); // Match animation duration
-
 
             } else {
                 mistakesLeft--;
                 mistakesLeftSpan.textContent = mistakesLeft;
+                mistakesLeftSpan.classList.add('mistake-lost-animation');
+                setTimeout(() => mistakesLeftSpan.classList.remove('mistake-lost-animation'), 400);
+
+                wordGrid.classList.add('shake-animation');
+                setTimeout(() => {
+                    wordGrid.classList.remove('shake-animation');
+                }, 400);
+
                 if (mistakesLeft === 0) {
                     revealAllCategories();
                     gameOverMessage.style.display = 'block';
-                    disableGameControls();
-                } else {
-                    // Add a shake animation for wrong guess (optional)
-                    wordGrid.classList.add('shake-animation');
-                    setTimeout(() => {
-                        wordGrid.classList.remove('shake-animation');
-                    }, 500);
-                    deselectAllWords(); // Deselect after wrong guess
+                    disableGameControls(true);
+                     const newGameBtn = document.createElement('button');
+                        newGameBtn.textContent = 'Try Again?';
+                        newGameBtn.onclick = loadNewPuzzle;
+                        gameOverMessage.appendChild(newGameBtn);
                 }
+                deselectAllWords(); // Deselect after wrong guess
             }
         }
 
         function revealAllCategories() {
             gameOverCategoriesDiv.innerHTML = ''; // Clear previous entries
-            categories.forEach(category => {
-                if (!isCategoryAlreadyDisplayed(category.name)) {
-                    const catDiv = document.createElement('div');
-                    catDiv.classList.add('category-display', category.color);
-                    catDiv.innerHTML = `<strong>${category.name}</strong>: ${category.words.join(', ')}`;
-                    gameOverCategoriesDiv.appendChild(catDiv);
-                }
+            // Sort categories: found ones first (if any partial game over), then by original order or difficulty
+            const sortedCategories = [...currentCategories].sort((a,b) => {
+                if (a.found && !b.found) return -1;
+                if (!a.found && b.found) return 1;
+                // Add more sophisticated sorting later (e.g. by color/difficulty)
+                return 0;
+            });
+
+            sortedCategories.forEach(category => {
+                const catDiv = document.createElement('div');
+                catDiv.classList.add('category-display', category.color);
+                catDiv.style.opacity = 1; // Make sure they are visible
+                catDiv.style.transform = 'translateY(0)';
+                catDiv.innerHTML = `<strong>${category.name}</strong>: ${category.words.join(', ')}`;
+                gameOverCategoriesDiv.appendChild(catDiv);
             });
         }
 
-        function isCategoryAlreadyDisplayed(categoryName) {
-            const displayedCategories = resultsArea.querySelectorAll('.category-display strong');
-            for (let displayedCat of displayedCategories) {
-                if (displayedCat.textContent === categoryName) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-
-        function disableGameControls() {
-            shuffleButton.disabled = true;
-            deselectButton.disabled = true;
+        function disableGameControls(isGameOver) {
             submitButton.disabled = true;
+            deselectButton.disabled = true;
+            shuffleButton.disabled = isGameOver; // Keep shuffle active if game won for a new puzzle
             document.querySelectorAll('.word-button').forEach(button => {
                 button.disabled = true;
             });
         }
 
         function enableGameControls() {
-            shuffleButton.disabled = false;
-            deselectButton.disabled = false;
             submitButton.disabled = false;
-            // Word buttons are enabled/disabled individually or via renderWordGrid
+            deselectButton.disabled = false;
+            shuffleButton.disabled = false;
+            // Word buttons are enabled by their creation in renderWordGrid
         }
 
         // --- Event Listeners ---
         shuffleButton.addEventListener('click', () => {
-            // Collect only words that are NOT part of a found category
-            const wordsToShuffle = [];
-            document.querySelectorAll('#word-grid .word-button:not([style*="visibility: hidden"])').forEach(btn => {
-                wordsToShuffle.push(btn.dataset.word);
-            });
+            const wordsToShuffle = allWords.filter(wordObj => !wordObj.found);
+            shuffleArray(wordsToShuffle);
 
-            shuffleArray(wordsToShuffle); // Shuffle the remaining words
+            // Create a new allWords array for rendering, keeping found words in place conceptually
+            // For simplicity, we'll just shuffle the active ones and re-render.
+            const foundWords = allWords.filter(wordObj => wordObj.found);
+            allWords = [...wordsToShuffle, ...foundWords]; // This might re-order found words internally, but they are not displayed
 
-            // Re-populate the grid with the shuffled order of remaining words
-            const gridButtons = Array.from(document.querySelectorAll('#word-grid .word-button'));
-            let shuffleIndex = 0;
-            gridButtons.forEach(button => {
-                if (button.style.visibility !== 'hidden') { // Only update visible buttons
-                    if (shuffleIndex < wordsToShuffle.length) {
-                        button.textContent = wordsToShuffle[shuffleIndex];
-                        button.dataset.word = wordsToShuffle[shuffleIndex];
-                        shuffleIndex++;
-                    }
-                }
-            });
-            deselectAllWords(); // Deselect after shuffle
+            renderWordGrid(); // Re-render the grid with shuffled active words
+            deselectAllWords();
         });
 
         deselectButton.addEventListener('click', deselectAllWords);
         submitButton.addEventListener('click', handleSubmit);
 
         // --- Initialize ---
-        initializeGame();
+        loadNewPuzzle(); // Load the first puzzle
 
     </script>
-    <style>
-        /* Add shake animation for incorrect guesses */
-        .shake-animation {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-        }
-    </style>
 </body>
 </html>
